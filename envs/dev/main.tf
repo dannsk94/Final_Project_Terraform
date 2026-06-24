@@ -1,3 +1,4 @@
+#Тригер для запуска(Нужно ввести любой символ:)(122323)
 terraform {
   required_providers {
     vkcs = {
