@@ -1,0 +1,108 @@
+name: Terraform Prod
+
+on:
+  workflow_dispatch:
+
+env:
+  TF_ROOT: envs/prod
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+jobs:
+  validate:
+    name: Validate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+      - name: Copy image ID (if exists)
+        run: |
+          if [ -f modules/compute/image.auto.tfvars ]; then
+            cp modules/compute/image.auto.tfvars envs/prod/
+            echo "Image ID copied"
+          else
+            echo "Using default image"
+          fi
+      - run: terraform init
+        working-directory: ${{ env.TF_ROOT }}
+      - run: terraform validate
+        working-directory: ${{ env.TF_ROOT }}
+
+  plan:
+    name: Plan
+    needs: validate
+    runs-on: ubuntu-latest
+    env:
+      OS_CLOUD: vkcs
+      TF_VAR_ssh_public_key: ${{ secrets.SSH_PUBLIC_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+      - name: Create clouds.yaml
+        run: |
+          mkdir -p ~/.config/openstack
+          echo "$CLOUDS_YAML" > ~/.config/openstack/clouds.yaml
+        env:
+          CLOUDS_YAML: ${{ secrets.CLOUDS_YAML }}
+      - name: Copy image ID (if exists)
+        run: |
+          if [ -f modules/compute/image.auto.tfvars ]; then
+            cp modules/compute/image.auto.tfvars envs/prod/
+            echo "Image ID copied"
+          else
+            echo "Using default image"
+          fi
+      - run: terraform init
+        working-directory: ${{ env.TF_ROOT }}
+      - run: terraform plan -var-file=prod.tfvars
+        working-directory: ${{ env.TF_ROOT }}
+
+  apply:
+    name: Apply
+    needs: plan
+    environment: prod
+    runs-on: ubuntu-latest
+    env:
+      OS_CLOUD: vkcs
+      TF_VAR_ssh_public_key: ${{ secrets.SSH_PUBLIC_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+      - name: Create clouds.yaml
+        run: |
+          mkdir -p ~/.config/openstack
+          echo "$CLOUDS_YAML" > ~/.config/openstack/clouds.yaml
+        env:
+          CLOUDS_YAML: ${{ secrets.CLOUDS_YAML }}
+      - name: Copy image ID (if exists)
+        run: |
+          if [ -f modules/compute/image.auto.tfvars ]; then
+            cp modules/compute/image.auto.tfvars envs/prod/
+            echo "Image ID copied"
+          else
+            echo "Using default image"
+          fi
+      - run: terraform init
+        working-directory: ${{ env.TF_ROOT }}
+      - run: terraform apply -auto-approve -var-file=prod.tfvars
+        working-directory: ${{ env.TF_ROOT }}
+
+  destroy:
+    name: Destroy Prod
+    environment: prod
+    runs-on: ubuntu-latest
+    env:
+      OS_CLOUD: vkcs
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+      - name: Create clouds.yaml
+        run: |
+          mkdir -p ~/.config/openstack
+          echo "$CLOUDS_YAML" > ~/.config/openstack/clouds.yaml
+        env:
+          CLOUDS_YAML: ${{ secrets.CLOUDS_YAML }}
+      - run: terraform init
+        working-directory: ${{ env.TF_ROOT }}
+      - run: terraform destroy -auto-approve
+        working-directory: ${{ env.TF_ROOT }}
