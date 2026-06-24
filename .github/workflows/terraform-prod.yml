@@ -113,5 +113,5 @@ jobs:
           CLOUDS_YAML: ${{ secrets.CLOUDS_YAML }}
       - run: terraform init
         working-directory: ${{ env.TF_ROOT }}
-      - run: terraform destroy -auto-approve
+      - run: terraform destroy -auto-approve -var-file=dev.tfvars
         working-directory: ${{ env.TF_ROOT }}
