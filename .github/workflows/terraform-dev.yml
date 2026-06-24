@@ -21,6 +21,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: hashicorp/setup-terraform@v3
+      - name: Copy image ID (if exists)
+        run: |
+          if [ -f modules/compute/image.auto.tfvars ]; then
+            cp modules/compute/image.auto.tfvars envs/dev/
+            echo "Image ID copied"
+          else
+            echo "Using default image"
+          fi
       - run: terraform init
         working-directory: ${{ env.TF_ROOT }}
       - run: terraform validate
@@ -43,6 +51,14 @@ jobs:
           echo "$CLOUDS_YAML" > ~/.config/openstack/clouds.yaml
         env:
           CLOUDS_YAML: ${{ secrets.CLOUDS_YAML }}
+      - name: Copy image ID (if exists)
+        run: |
+          if [ -f modules/compute/image.auto.tfvars ]; then
+            cp modules/compute/image.auto.tfvars envs/dev/
+            echo "Image ID copied"
+          else
+            echo "Using default image"
+          fi
       - run: terraform init
         working-directory: ${{ env.TF_ROOT }}
       - run: terraform plan -var-file=dev.tfvars
@@ -66,6 +82,14 @@ jobs:
           echo "$CLOUDS_YAML" > ~/.config/openstack/clouds.yaml
         env:
           CLOUDS_YAML: ${{ secrets.CLOUDS_YAML }}
+      - name: Copy image ID (if exists)
+        run: |
+          if [ -f modules/compute/image.auto.tfvars ]; then
+            cp modules/compute/image.auto.tfvars envs/dev/
+            echo "Image ID copied"
+          else
+            echo "Using default image"
+          fi
       - run: terraform init
         working-directory: ${{ env.TF_ROOT }}
       - run: terraform apply -auto-approve -var-file=dev.tfvars
