@@ -114,7 +114,7 @@ jobs:
       - name: Copy image ID (if exists)
         run: |
           if [ -f modules/compute/image.auto.tfvars ]; then
-            cp modules/compute/image.auto.tfvars envs/dev/
+            cp modules/compute/image.auto.tfvars envs/prod/
             echo "Image ID copied"
           else
             echo "Using default image"
