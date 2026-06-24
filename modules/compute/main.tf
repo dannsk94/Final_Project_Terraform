@@ -1,3 +1,7 @@
+data "vkcs_networking_network" "external" {
+  name = "internet"
+}
+
 # Бастион
 resource "vkcs_compute_instance" "bastion" {
   name      = "${var.project_name}-bastion"
@@ -27,12 +31,18 @@ resource "vkcs_compute_instance" "bastion" {
 
 # Floating IP для бастиона
 resource "vkcs_networking_floatingip" "bastion" {
-  pool = "internet"
+  pool = data.vkcs_networking_network.external.name
+}
+
+data "vkcs_networking_port" "bastion" {
+  fixed_ip   = var.bastion_ip
+  network_id = var.vpc_id
+  depends_on = [vkcs_compute_instance.bastion]
 }
 
 resource "vkcs_networking_floatingip_associate" "bastion" {
   floating_ip = vkcs_networking_floatingip.bastion.address
-  port_id     = vkcs_compute_instance.bastion.network[0].port
+  port_id     = data.vkcs_networking_port.bastion.id
 }
 
 # Веб-серверы
