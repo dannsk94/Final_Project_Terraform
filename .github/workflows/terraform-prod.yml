@@ -1,6 +1,11 @@
 name: Terraform Prod
 
 on:
+  push:
+    branches: [main]
+    paths: ['envs/prod/**', 'modules/**']
+  pull_request:
+    branches: [main]
   workflow_dispatch:
 
 env:
@@ -11,6 +16,7 @@ env:
 jobs:
   validate:
     name: Validate
+    if: github.event_name != 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -30,6 +36,7 @@ jobs:
 
   plan:
     name: Plan
+    if: github.event_name != 'workflow_dispatch'
     needs: validate
     runs-on: ubuntu-latest
     env:
