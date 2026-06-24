@@ -1,6 +1,9 @@
 resource "vkcs_lb_loadbalancer" "main" {
   name          = "${var.project_name}-lb"
   vip_subnet_id = var.subnet_id
+  timeouts {
+    delete = "10m"
+  }
 }
 
 resource "vkcs_lb_listener" "http" {
