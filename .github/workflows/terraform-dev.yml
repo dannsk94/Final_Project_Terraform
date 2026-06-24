@@ -45,7 +45,7 @@ jobs:
           CLOUDS_YAML: ${{ secrets.CLOUDS_YAML }}
       - run: terraform init
         working-directory: ${{ env.TF_ROOT }}
-      - run: terraform plan
+      - run: terraform plan -var-file=dev.tfvars
         working-directory: ${{ env.TF_ROOT }}
 
   apply:
@@ -68,7 +68,7 @@ jobs:
           CLOUDS_YAML: ${{ secrets.CLOUDS_YAML }}
       - run: terraform init
         working-directory: ${{ env.TF_ROOT }}
-      - run: terraform apply -auto-approve
+      - run: terraform apply -auto-approve -var-file=dev.tfvars
         working-directory: ${{ env.TF_ROOT }}
 
   destroy:
