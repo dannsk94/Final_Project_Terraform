@@ -1,0 +1,1 @@
+output "lb_public_ip" { value = vkcs_networking_floatingip.lb.address }

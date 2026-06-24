@@ -1,0 +1,10 @@
+variable "project_name" { type = string }
+variable "my_ip" { default = "0.0.0.0/0" }
+variable "ssh_public_key" { type = string }
+variable "web_count" { type = number }
+variable "image_id" { type = string }
+variable "public_subnet_cidr" { type = string }
+variable "private_subnet_cidr" { type = string }
+variable "bastion_ip" { type = string }
+variable "web_ip_base" { type = string }
+variable "db_ip" { type = string }

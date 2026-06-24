@@ -1,0 +1,12 @@
+# Пример конфигурации prod окружения
+# Скопируйте в prod.tfvars и настройте
+
+project_name       = "lab7-prod"
+web_count          = 2
+my_ip              = "УКАЖИТЕ_ВАШ_IP/32"
+ssh_public_key     = "УКАЖИТЕ_ВАШ_ПУБЛИЧНЫЙ_КЛЮЧ"
+public_subnet_cidr  = "192.168.11.0/24"
+private_subnet_cidr = "192.168.12.0/24"
+bastion_ip          = "192.168.11.50"
+web_ip_base         = "192.168.12"
+db_ip               = "192.168.12.200"

@@ -1,0 +1,9 @@
+output "vpc_id" { value = vkcs_networking_network.vpc.id }
+output "public_subnet_id" { value = vkcs_networking_subnet.public.id }
+output "private_subnet_id" { value = vkcs_networking_subnet.private.id }
+output "bastion_sg_id" { value = vkcs_networking_secgroup.bastion_sg.id }
+output "web_sg_id" { value = vkcs_networking_secgroup.web_sg.id }
+output "db_sg_id" { value = vkcs_networking_secgroup.db_sg.id }
+output "lb_sg_id" { value = vkcs_networking_secgroup.lb_sg.id }
+output "keypair_name" { value = vkcs_compute_keypair.main.name }
+output "private_router_interface" { value = vkcs_networking_router_interface.private }

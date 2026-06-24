@@ -1,0 +1,15 @@
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+.terraform.lock.hcl
+*.log
+
+# Packer
+packer/clouds.yaml
+packer/build.log
+packer/variables.pkrvars.hcl
+
+# IDE
+.vscode/
+.idea/

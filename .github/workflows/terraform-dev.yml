@@ -1,0 +1,93 @@
+name: Terraform Dev
+
+on:
+  push:
+    branches: [main]
+    paths: ['envs/dev/**', 'modules/**']
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  TF_ROOT: envs/dev
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+jobs:
+  validate:
+    name: Validate
+    if: github.event_name != 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+      - run: terraform init
+        working-directory: ${{ env.TF_ROOT }}
+      - run: terraform validate
+        working-directory: ${{ env.TF_ROOT }}
+
+  plan:
+    name: Plan
+    if: github.event_name != 'workflow_dispatch'
+    needs: validate
+    runs-on: ubuntu-latest
+    env:
+      OS_CLOUD: vkcs
+      TF_VAR_ssh_public_key: ${{ secrets.SSH_PUBLIC_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+      - name: Create clouds.yaml
+        run: |
+          mkdir -p ~/.config/openstack
+          echo "$CLOUDS_YAML" > ~/.config/openstack/clouds.yaml
+        env:
+          CLOUDS_YAML: ${{ secrets.CLOUDS_YAML }}
+      - run: terraform init
+        working-directory: ${{ env.TF_ROOT }}
+      - run: terraform plan
+        working-directory: ${{ env.TF_ROOT }}
+
+  apply:
+    name: Apply
+    if: github.event_name != 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    needs: plan
+    environment: dev
+    runs-on: ubuntu-latest
+    env:
+      OS_CLOUD: vkcs
+      TF_VAR_ssh_public_key: ${{ secrets.SSH_PUBLIC_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+      - name: Create clouds.yaml
+        run: |
+          mkdir -p ~/.config/openstack
+          echo "$CLOUDS_YAML" > ~/.config/openstack/clouds.yaml
+        env:
+          CLOUDS_YAML: ${{ secrets.CLOUDS_YAML }}
+      - run: terraform init
+        working-directory: ${{ env.TF_ROOT }}
+      - run: terraform apply -auto-approve
+        working-directory: ${{ env.TF_ROOT }}
+
+  destroy:
+    name: Destroy Dev
+    if: github.event_name == 'workflow_dispatch'
+    environment: dev
+    runs-on: ubuntu-latest
+    env:
+      OS_CLOUD: vkcs
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+      - name: Create clouds.yaml
+        run: |
+          mkdir -p ~/.config/openstack
+          echo "$CLOUDS_YAML" > ~/.config/openstack/clouds.yaml
+        env:
+          CLOUDS_YAML: ${{ secrets.CLOUDS_YAML }}
+      - run: terraform init
+        working-directory: ${{ env.TF_ROOT }}
+      - run: terraform destroy -auto-approve
+        working-directory: ${{ env.TF_ROOT }}
