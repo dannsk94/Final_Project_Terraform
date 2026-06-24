@@ -121,5 +121,5 @@ jobs:
           fi
       - run: terraform init
         working-directory: ${{ env.TF_ROOT }}
-      - run: terraform destroy -auto-approve -var-file=dev.tfvars
+      - run: terraform destroy -auto-approve -var-file=prod.tfvars
         working-directory: ${{ env.TF_ROOT }}
