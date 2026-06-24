@@ -70,8 +70,9 @@ build {
       "sudo apt-get install -y nginx",
       
       "echo 'Installing PHP...'",
-      "sudo apt-get install -y php-fpm php-mysqlnd --fix-missing",
-      
+      "sudo apt-get install -y mime-support php-common",
+      "sudo apt-get install -y php-fpm php-mysqlnd --fix-broken",
+  
       "echo 'Configuring nginx...'",
       "sudo systemctl enable nginx",
       "sudo systemctl start nginx",
