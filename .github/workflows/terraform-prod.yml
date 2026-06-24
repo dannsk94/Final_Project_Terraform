@@ -59,6 +59,7 @@ jobs:
 
   apply:
     name: Apply
+    if: github.event_name != 'workflow_dispatch' && github.ref == 'refs/heads/main'
     needs: plan
     environment: prod
     runs-on: ubuntu-latest
@@ -89,6 +90,7 @@ jobs:
 
   destroy:
     name: Destroy Prod
+    if: github.event_name == 'workflow_dispatch'
     environment: prod
     runs-on: ubuntu-latest
     env:
