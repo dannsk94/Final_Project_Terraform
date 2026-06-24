@@ -28,7 +28,7 @@ variable "source_image" {
 
 variable "network_id" {
   type    = string
-  default = "ec8c610e-6387-447e-83d2-d2c541e88164"
+  default = "84fa5ee4-d567-4e95-9221-19b92f761206"
 }
 
 variable "security_groups" {
