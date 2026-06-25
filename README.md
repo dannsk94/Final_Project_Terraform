@@ -45,9 +45,9 @@
 
 | Workflow | Триггер | Описание |
 |----------|---------|----------|
-| **Packer Build** | Ручной (`workflow_dispatch`) | Сборка образа, авто-push ID |
-| **Terraform Dev** | Push в `main` | Validate → Plan → Apply (подтверждение) |
-| **Terraform Prod** | Push в `main` | Validate → Plan → Apply (подтверждение) |
+| **Packer Build** | Ручной | Сборка образа, авто-push ID |
+| **Terraform Dev** | Push / Ручной | Validate → Plan → Apply / Destroy |
+| **Terraform Prod** | Push / Ручной | Validate → Plan → Apply / Destroy |
 
 ## 🔧 Технологии
 
@@ -55,37 +55,98 @@
 - **Packer** — сборка образов (Ubuntu + nginx + PHP)
 - **GitHub Actions** — CI/CD пайплайн
 - **VK Cloud** — облачный провайдер
+- **OpenRC** — авторизация в VK Cloud
 
-## 🛠️ Использование
+## 🛠️ Порядок развертывания
 
-### Локальный запуск
+### 1. Настроить переменные окружения
+
+Скопировать `.example` файлы в `*.tfvars`, указав свои параметры (ключи доступа, и т.д.).
+
+### 2. Выбор сценария работы с образами ВМ
+
+#### Вариант А: Использование стандартного Ubuntu (без Packer)
+
+Ничего дополнительно делать не требуется. При создании ВМ через Terraform будет использован стандартный образ Ubuntu 22.04, а nginx установится через `user_data`:
+
+```hcl
+user_data = <<-EOF
+  #!/bin/bash
+  apt-get update && apt-get install -y nginx
+  systemctl enable nginx && systemctl start nginx
+  echo "<h1>Web Server ${count.index + 1}</h1>" > /var/www/html/index.html
+EOF
+```
+
+##### Вариант Б: Сборка кастомизированного Packer образа
+**Локальная сборка:**
 
 ```bash
-# Packer
 cd packer
 cp variables.pkrvars.hcl.example variables.pkrvars.hcl
-# Настройте variables.pkrvars.hcl под свой проект
+# Отредактировать variables.pkrvars.hcl, указав свои параметры:
+# network_id = ["<network_id>"] - ID сети для Packer
+# security_groups = ["packer"] - Security Group для Packer
+# flavor = "STD2-2-4" - 2 vCPU, 4 GB RAM
+# source_image = "<image_id>" - Ubuntu 22.04
 packer init lab-packer-config.pkr.hcl
-OS_CLOUD=vkcs packer build lab-packer-config.pkr.hcl
+packer build lab-packer-config.pkr.hcl
+```
 
-# Terraform Dev
+> **Примечание:** для успешной сборки Packer необходима отдельная приватная сеть с роутером.
+
+После успешной сборки Packer создаст файл `modules/compute/image.auto.tfvars` с ID нового образа.
+
+Для использования собранного образа в Terraform необходимо скопировать этот файл в директории окружений:
+
+```bash
+cp modules/compute/image.auto.tfvars envs/dev/
+cp modules/compute/image.auto.tfvars envs/prod/
+```
+
+**Сборка через CI/CD (GitHub Actions):**
+
+1. Запустить workflow **Packer Build** вручную из интерфейса GitHub Actions
+2. Дождаться завершения сборки (около 5-7 минут)
+3. Выполнить `git pull`, чтобы получить обновлённый файл `modules/compute/image.auto.tfvars` с ID нового образа
+4. **Отключить защиту:** закомментировать `lifecycle { ignore_changes = [image_id] }` в `modules/compute/main.tf`
+5. Файл автоматически скопируется в `envs/dev/` и `envs/prod/` через шаг `Copy image ID to envs` в CI/CD пайплайне
+6. **Применить Terraform:** `terraform apply` — ВМ пересоздадутся с новым образом
+7. **Вернуть защиту:** раскомментировать `lifecycle` обратно
+8. При последующих `terraform apply` ВМ не будут пересоздаваться
+
+### 3. Развертывание окружения Dev
+
+```bash
 cd envs/dev
 terraform init
 terraform plan -var-file=dev.tfvars
 terraform apply -var-file=dev.tfvars
+```
 
-# Terraform Prod
+### 4. Развертывание окружения Prod
+```bash
 cd envs/prod
 terraform init
 terraform plan -var-file=prod.tfvars
 terraform apply -var-file=prod.tfvars
 ```
 
-## CI/CD запуск
+### 5. Автоматический CI/CD для Terraform
 
-- **Packer:** Actions → Packer Build → Run workflow
-- **Terraform Dev/Prod** запускаются автоматически при push
-- **Apply** требует подтверждения в GitHub
+**Terraform Plan/Apply:**
+
+- При пуше в `main` пайплайны `terraform-dev.yml` и `terraform-prod.yml` автоматически запускают `validate` и `plan`
+- Для запуска `apply` необходимо внести изменения в любой файл в `envs/dev/` или `envs/prod/` (например, добавить комментарий в `main.tf`) и запушить в `main` — это запустит пайплайн с `validate` и `plan`, после чего `apply` требует ручного подтверждения через `environment: dev/prod` в GitHub Actions (кнопка **Review** в интерфейсе GitHub)
+- После подтверждения применяются изменения инфраструктуры
+
+**Terraform Destroy:**
+
+- Выполняется вручную через запуск workflow **Destroy Dev** или **Destroy Prod** из интерфейса GitHub Actions
+- Требует ручного подтверждения через `environment: dev` или `environment: prod` для защиты от случайного удаления
+- Удаляет все ресурсы окружения в обратном порядке создания (защищено от даунтайма)
+
+> **Важно:** Файл `variables.pkrvars.hcl` не заливается в Git (добавлен в `.gitignore`), так как содержит реальные ID ресурсов. В репозитории хранится только `variables.pkrvars.hcl.example` как шаблон.
 
 ## 📝 Переменные
 
@@ -95,16 +156,26 @@ terraform apply -var-file=prod.tfvars
 | `bastion_ip` | IP бастиона | 192.168.1.50 | 192.168.11.50 |
 | `db_ip` | IP БД | 192.168.2.200 | 192.168.12.200 |
 
-## 🔐 Обновление Packer образа
+## 🗑️ Удаление инфраструктуры
 
-По умолчанию в модуле `compute` используется `lifecycle { ignore_changes = [image_id] }`. Это защищает ВМ от пересоздания при каждом `terraform apply`.
+**Локально:**
+```bash
+# Dev
+cd envs/dev
+terraform destroy -var-file=dev.tfvars
 
-### Когда нужно обновить образ:
-1. **Запустить Packer** (локально или через GitHub Actions → Packer Build)
-2. **Получить новый ID образа:**
-   - Локально: Packer запишет `image.auto.tfvars` автоматически
-   - Через CI/CD: выполнить `git pull` для получения обновлённого `image.auto.tfvars`
-3. **Отключить защиту:** закомментировать `lifecycle { ignore_changes = [image_id] }` в `modules/compute/main.tf`
-4. **Применить Terraform:** `terraform apply` — ВМ пересоздадутся с новым образом
-5. **Вернуть защиту:** раскомментировать `lifecycle` обратно
-6. При последующих `terraform apply` ВМ не будут пересоздаваться
+# Prod
+cd envs/prod
+terraform destroy -var-file=prod.tfvars
+```
+
+**Через CI/CD:**
+
+| Workflow | Триггер | Описание |
+|----------|---------|----------|
+| **Destroy Dev** | Ручной (`workflow_dispatch`) | Удаление инфраструктуры DEV |
+| **Destroy Prod** | Ручной (`workflow_dispatch`) | Удаление инфраструктуры PROD |
+
+- Запускаются вручную из интерфейса GitHub Actions
+- Требуют ручного подтверждения через `environment: dev` и `environment: prod` для защиты от случайного удаления
+- Удаляют все ресурсы окружения в обратном порядке создания
