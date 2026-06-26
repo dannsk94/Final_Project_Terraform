@@ -94,7 +94,7 @@ resource "vkcs_compute_instance" "web" {
     nohup bash -c 'sleep 600 && systemctl start unattended-upgrades' &
   EOF
 
-  lifecycle {
-    ignore_changes = [image_id]
-  }
+#  lifecycle {
+#    ignore_changes = [image_id]
+#  }
 }
