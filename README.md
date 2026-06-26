@@ -49,6 +49,27 @@
 | **Terraform Dev** | Push / Ручной | Validate → Plan → Apply / Destroy |
 | **Terraform Prod** | Push / Ручной | Validate → Plan → Apply / Destroy |
 
+## 🔐 GitHub Secrets
+
+Для работы CI/CD пайплайнов необходимы следующие секреты репозитория:
+
+| Secret | Назначение |
+|--------|------------|
+| `CLOUDS_YAML` | Конфигурация `clouds.yaml` для аутентификации Packer и Terraform в VK Cloud. Содержит те же параметры, что и `openrc.sh`, но в формате YAML |
+| `AWS_ACCESS_KEY_ID` | Ключ доступа к S3 (хранение state) |
+| `AWS_SECRET_ACCESS_KEY` | Секретный ключ доступа к S3 |
+| `SSH_PUBLIC_KEY` | Публичный SSH-ключ для доступа к ВМ |
+| `PACKER_GITHUB_API_TOKEN` | GitHub токен для скачивания Packer плагинов |
+| `MY_IP` | Ваш публичный IP для Security Groups (`0.0.0.0/0` для открытого доступа) |
+| `OS_AUTH_URL` | URL аутентификации VK Cloud |
+| `OS_USERNAME` | Имя пользователя VK Cloud |
+| `OS_PASSWORD` | Пароль пользователя VK Cloud |
+| `OS_PROJECT_ID` | ID проекта VK Cloud |
+| `OS_REGION_NAME` | Регион (RegionOne) |
+| `OS_USER_DOMAIN_NAME` | Домен пользователя (users) |
+| `OS_INTERFACE` | Интерфейс (public) |
+| `OS_IDENTITY_API_VERSION` | Версия API (3) |
+
 ## 🔧 Технологии
 
 - **Terraform** — Infrastructure as Code (модули, S3 backend)
