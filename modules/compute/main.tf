@@ -29,6 +29,12 @@ resource "vkcs_compute_instance" "bastion" {
     delete_on_termination = true
   }
 
+  user_data = <<-EOF
+    #!/bin/bash
+    apt-get update && apt-get install -y openssh-server
+    systemctl enable ssh && systemctl start ssh
+  EOF
+
   lifecycle {
     ignore_changes = [image_id]
   }
@@ -76,7 +82,8 @@ resource "vkcs_compute_instance" "web" {
 
   user_data = <<-EOF
     #!/bin/bash
-    apt-get update && apt-get install -y nginx
+    apt-get update && apt-get install -y openssh-server nginx
+    systemctl enable ssh && systemctl start ssh
     systemctl enable nginx && systemctl start nginx
     echo "<h1>Web Server ${count.index + 1}</h1>" > /var/www/html/index.html
   EOF
