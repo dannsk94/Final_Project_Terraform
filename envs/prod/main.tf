@@ -52,6 +52,7 @@ module "compute" {
   web_sg_id      = module.network.web_sg_id
   keypair_name   = module.network.keypair_name
   bastion_ip     = var.bastion_ip
+  bastion_private_ip = var.bastion_private_ip
   web_ip_base    = var.web_ip_base
 }
 
