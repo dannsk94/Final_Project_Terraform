@@ -38,7 +38,7 @@ resource "vkcs_networking_secgroup" "bastion_sg" {
 
 resource "vkcs_networking_secgroup_rule" "bastion_ssh" {
   direction         = "ingress"
-  protocol          = "tcp"
+  protocol          = "any"
   port_range_min    = 1
   port_range_max    = 65535
   remote_ip_prefix  = var.my_ip
