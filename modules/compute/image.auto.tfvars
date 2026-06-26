@@ -1,1 +1,1 @@
-image_id = "b892fdc0-1cb2-49bf-9969-1dc8984dc562"
+image_id = "5a5f43b0-2de8-48a1-9570-b48929c0460f"
