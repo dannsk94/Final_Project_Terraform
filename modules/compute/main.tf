@@ -8,6 +8,7 @@ resource "vkcs_compute_instance" "bastion" {
   flavor_id = var.flavor_id
   image_id  = var.image_id
   key_pair  = var.keypair_name
+  availability_zone = "MS1"
 
   network {
     uuid = var.vpc_id
@@ -29,13 +30,6 @@ resource "vkcs_compute_instance" "bastion" {
     volume_type           = "ceph-ssd" 
     delete_on_termination = true
   }
-
-  user_data = <<-EOF
-    #!/bin/bash
-    killall -9 unattended-upgrades 2>/dev/null || true
-    echo "UseDNS no" >> /etc/ssh/sshd_config
-    systemctl restart ssh
-  EOF
 
   lifecycle {
     ignore_changes = [image_id]
@@ -66,6 +60,7 @@ resource "vkcs_compute_instance" "web" {
   flavor_id = var.flavor_id
   image_id  = var.image_id
   key_pair  = var.keypair_name
+  availability_zone = "MS1"
 
   network {
     uuid = var.vpc_id
@@ -85,13 +80,9 @@ resource "vkcs_compute_instance" "web" {
 
   user_data = <<-EOF
     #!/bin/bash
-    systemctl stop unattended-upgrades
-    export DEBIAN_FRONTEND=noninteractive
-    apt-get update && apt-get install -y openssh-server nginx
-    systemctl enable ssh && systemctl start ssh
+    apt-get update && apt-get install -y nginx
     systemctl enable nginx && systemctl start nginx
     echo "<h1>Web Server ${count.index + 1}</h1>" > /var/www/html/index.html
-    nohup bash -c 'sleep 600 && systemctl start unattended-upgrades' &
   EOF
 
   lifecycle {
