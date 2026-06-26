@@ -3,6 +3,7 @@ variable "web_count" { type = number }
 variable "vpc_id" { type = string }
 variable "subnet_id" { type = string }
 variable "bastion_ip" { type = string }
+variable "bastion_private_ip" { type = string }
 variable "web_ip_base" { type = string } 
 variable "bastion_sg_id" { type = string }
 variable "web_sg_id" { type = string }

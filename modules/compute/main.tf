@@ -13,6 +13,11 @@ resource "vkcs_compute_instance" "bastion" {
     uuid = var.vpc_id
     fixed_ip_v4 = var.bastion_ip
   }
+  
+    network {
+    uuid        = var.subnet_id
+    fixed_ip_v4 = var.bastion_private_ip
+  }
 
   security_group_ids = [var.bastion_sg_id]
 
