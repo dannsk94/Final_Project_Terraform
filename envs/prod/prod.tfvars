@@ -1,4 +1,5 @@
 project_name   = "lab7-prod"
+web_count = 2
 public_subnet_cidr = "192.168.11.0/24"
 private_subnet_cidr = "192.168.12.0/24"
 # Для правильного распределения по подсетям используем фиксированные ip-адреса
