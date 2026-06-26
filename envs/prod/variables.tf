@@ -12,4 +12,3 @@ variable "bastion_ip" { type = string }
 variable "bastion_private_ip" { type = string }
 variable "web_ip_base" { type = string }
 variable "db_ip" { type = string }
-variable "subnet_id" { type = string }
