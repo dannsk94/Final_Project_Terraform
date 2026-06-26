@@ -13,3 +13,4 @@ packer/variables.pkrvars.hcl
 # IDE
 .vscode/
 .idea/
+*.local.tfvars

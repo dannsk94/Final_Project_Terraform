@@ -1,12 +1,5 @@
 # Пример конфигурации dev окружения
-# Скопируйте в dev.tfvars и настройте
+# Скопируйте в dev.local.tfvars и настройте
 
-project_name       = "lab7-dev"
-web_count          = 1
-my_ip              = "0.0.0.0/0"
+my_ip              = "УКАЖИТЕ_ВАШ_IP/32"
 ssh_public_key     = "УКАЖИТЕ_ВАШ_ПУБЛИЧНЫЙ_КЛЮЧ"
-public_subnet_cidr  = "192.168.1.0/24"
-private_subnet_cidr = "192.168.2.0/24"
-bastion_ip          = "192.168.1.50"
-web_ip_base         = "192.168.2"
-db_ip               = "192.168.2.200"
