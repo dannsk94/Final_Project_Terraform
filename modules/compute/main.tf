@@ -33,6 +33,7 @@ resource "vkcs_compute_instance" "bastion" {
     #!/bin/bash
     systemctl stop unattended-upgrades
     export DEBIAN_FRONTEND=noninteractive
+    echo 'postgresql-common postgresql-common/obsolete-major note' | debconf-set-selections
     apt-get update && apt-get install -y openssh-server
     systemctl enable ssh && systemctl start ssh
     nohup apt-get install -y postgresql-client &
@@ -86,10 +87,13 @@ resource "vkcs_compute_instance" "web" {
 
   user_data = <<-EOF
     #!/bin/bash
+    systemctl stop unattended-upgrades
+    export DEBIAN_FRONTEND=noninteractive
     apt-get update && apt-get install -y openssh-server nginx
     systemctl enable ssh && systemctl start ssh
     systemctl enable nginx && systemctl start nginx
     echo "<h1>Web Server ${count.index + 1}</h1>" > /var/www/html/index.html
+    nohup bash -c 'sleep 600 && systemctl start unattended-upgrades' &
   EOF
 
   lifecycle {
