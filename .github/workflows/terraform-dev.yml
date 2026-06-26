@@ -62,8 +62,10 @@ jobs:
           fi
       - run: terraform init
         working-directory: ${{ env.TF_ROOT }}
-      - run: terraform plan -var-file=dev.tfvars -var "my_ip=${{ secrets.MY_IP }}"
+      - run: terraform plan -var-file=dev.tfvars
         working-directory: ${{ env.TF_ROOT }}
+        env:
+          TF_VAR_my_ip: ${{ secrets.MY_IP }}
 
   apply:
     name: Apply
@@ -94,8 +96,10 @@ jobs:
           fi
       - run: terraform init
         working-directory: ${{ env.TF_ROOT }}
-      - run: terraform apply -auto-approve -var-file=dev.tfvars -var "my_ip=${{ secrets.MY_IP }}"
+      - run: terraform apply -auto-approve -var-file=dev.tfvars
         working-directory: ${{ env.TF_ROOT }}
+        env:
+          TF_VAR_my_ip: ${{ secrets.MY_IP }}
 
   destroy:
     name: Destroy Dev
@@ -124,5 +128,7 @@ jobs:
           fi
       - run: terraform init
         working-directory: ${{ env.TF_ROOT }}
-      - run: terraform destroy -auto-approve -var-file=dev.tfvars -var "my_ip=${{ secrets.MY_IP }}"
+      - run: terraform destroy -auto-approve -var-file=dev.tfvars
         working-directory: ${{ env.TF_ROOT }}
+        env:
+          TF_VAR_my_ip: ${{ secrets.MY_IP }}
