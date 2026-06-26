@@ -9,5 +9,6 @@ variable "image_id" {
 variable "public_subnet_cidr" { type = string }
 variable "private_subnet_cidr" { type = string }
 variable "bastion_ip" { type = string }
+variable "bastion_private_ip" { type = string }
 variable "web_ip_base" { type = string }
 variable "db_ip" { type = string }
