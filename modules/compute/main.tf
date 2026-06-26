@@ -31,8 +31,12 @@ resource "vkcs_compute_instance" "bastion" {
 
   user_data = <<-EOF
     #!/bin/bash
+    systemctl stop unattended-upgrades
+    export DEBIAN_FRONTEND=noninteractive
     apt-get update && apt-get install -y openssh-server
     systemctl enable ssh && systemctl start ssh
+    nohup apt-get install -y postgresql-client &
+    sleep 600 && systemctl start unattended-upgrades &
   EOF
 
   lifecycle {
