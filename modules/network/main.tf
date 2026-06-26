@@ -32,11 +32,15 @@ resource "vkcs_networking_router_interface" "private" {
 resource "vkcs_networking_secgroup" "bastion_sg" {
   name = "${var.project_name}-bastion-sg"
 }
+
+# ВАЖНО: из-за особенностей VK Cloud при volume boot недостаточно открыть только порт 22.
+# Требуется открыть весь диапазон TCP-портов для корректной работы SSH.
+
 resource "vkcs_networking_secgroup_rule" "bastion_ssh" {
   direction         = "ingress"
   protocol          = "tcp"
-  port_range_min    = 22
-  port_range_max    = 22
+  port_range_min    = 1
+  port_range_max    = 65535
   remote_ip_prefix  = var.my_ip
   security_group_id = vkcs_networking_secgroup.bastion_sg.id
 }
