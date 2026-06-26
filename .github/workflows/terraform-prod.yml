@@ -66,6 +66,7 @@ jobs:
         working-directory: ${{ env.TF_ROOT }}
         env:
           TF_VAR_my_ip: ${{ secrets.MY_IP }}
+          TF_VAR_ssh_public_key: ${{ secrets.SSH_PUBLIC_KEY }}
 
   apply:
     name: Apply
@@ -100,6 +101,7 @@ jobs:
         working-directory: ${{ env.TF_ROOT }}
         env:
           TF_VAR_my_ip: ${{ secrets.MY_IP }}
+          TF_VAR_ssh_public_key: ${{ secrets.SSH_PUBLIC_KEY }}
 
   destroy:
     name: Destroy Prod
@@ -132,3 +134,4 @@ jobs:
         working-directory: ${{ env.TF_ROOT }}
         env:
           TF_VAR_my_ip: ${{ secrets.MY_IP }}
+          TF_VAR_ssh_public_key: ${{ secrets.SSH_PUBLIC_KEY }}
