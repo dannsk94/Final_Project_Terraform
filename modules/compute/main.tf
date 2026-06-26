@@ -31,7 +31,7 @@ resource "vkcs_compute_instance" "bastion" {
 
   user_data = <<-EOF
     #!/bin/bash
-    apt-get update && apt-get install -y openssh-server postgresql-client
+    apt-get update && apt-get install -y openssh-server
     systemctl enable ssh && systemctl start ssh
   EOF
 
