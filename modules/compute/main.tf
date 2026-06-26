@@ -26,18 +26,15 @@ resource "vkcs_compute_instance" "bastion" {
     source_type           = "image"
     destination_type      = "volume"
     volume_size           = 10
+    volume_type           = "ceph-ssd" 
     delete_on_termination = true
   }
 
   user_data = <<-EOF
     #!/bin/bash
-    systemctl stop unattended-upgrades
-    export DEBIAN_FRONTEND=noninteractive
-    echo 'postgresql-common postgresql-common/obsolete-major note' | debconf-set-selections
-    apt-get update && apt-get install -y openssh-server
-    systemctl enable ssh && systemctl start ssh
-    nohup apt-get install -y postgresql-client &
-    sleep 600 && systemctl start unattended-upgrades &
+    killall -9 unattended-upgrades 2>/dev/null || true
+    echo "UseDNS no" >> /etc/ssh/sshd_config
+    systemctl restart ssh
   EOF
 
   lifecycle {
@@ -82,6 +79,7 @@ resource "vkcs_compute_instance" "web" {
     source_type           = "image"
     destination_type      = "volume"
     volume_size           = 10
+    volume_type           = "ceph-ssd" 
     delete_on_termination = true
   }
 
