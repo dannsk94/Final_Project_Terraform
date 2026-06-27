@@ -108,7 +108,10 @@ jobs:
 
       - name: Health Check & Repair Floating IPs
         if: success()
-        run: ../../scripts/health-check-dev.sh
+        run: | 
+          chmod +x ../../scripts/*.sh
+          cd ${{ env.TF_ROOT }}
+          ../../scripts/health-check-dev.sh
         working-directory: ${{ env.TF_ROOT }}
         env:
           OS_AUTH_URL: ${{ secrets.OS_AUTH_URL }}
