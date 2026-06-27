@@ -36,9 +36,9 @@ resource "vkcs_compute_instance" "bastion" {
     nohup bash -c 'sleep 120 && reboot' &
   EOF  
 
- # lifecycle {
-  #  ignore_changes = [image_id]
- # }
+  lifecycle {
+    ignore_changes = [image_id]
+  }
 }
 
 # Floating IP для бастиона
@@ -90,7 +90,7 @@ resource "vkcs_compute_instance" "web" {
     echo "<h1>Web Server ${count.index + 1}</h1>" > /var/www/html/index.html
   EOF
 
-#  lifecycle {
-#    ignore_changes = [image_id]
-#  }
+  lifecycle {
+    ignore_changes = [image_id]
+  }
 }
