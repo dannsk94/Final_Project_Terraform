@@ -31,9 +31,14 @@ resource "vkcs_compute_instance" "bastion" {
     delete_on_termination = true
   }
 
-  lifecycle {
-    ignore_changes = [image_id]
-  }
+  user_data = <<-EOF
+    #!/bin/bash
+    nohup bash -c 'sleep 120 && reboot' &
+  EOF  
+
+ # lifecycle {
+  #  ignore_changes = [image_id]
+ # }
 }
 
 # Floating IP для бастиона
