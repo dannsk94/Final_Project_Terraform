@@ -70,7 +70,7 @@ build {
       "sudo apt-get install -y nginx",
       
       "echo 'Installing PHP...'",
-      "sudo apt-get install -y php-cli php-fpm php-mysql php-common",
+      "sudo apt-get install -y php8.3-cli php8.3-fpm php8.3-mysql php8.3-common --fix-missing",
   
       "echo 'Configuring nginx...'",
       "sudo systemctl enable nginx",
