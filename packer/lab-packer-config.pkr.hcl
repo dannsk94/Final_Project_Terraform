@@ -69,8 +69,8 @@ build {
       "echo 'Installing nginx...'",
       "sudo apt-get install -y nginx",
       
-      "echo 'Installing PHP...'",
-      "sudo apt-get install -y php8.1-cli php8.1-fpm php8.1-mysql php8.1-common --fix-missing",
+     # "echo 'Installing PHP...'",
+     # "sudo apt-get install -y php8.1-cli php8.1-fpm php8.1-mysql php8.1-common --fix-missing",
   
       "echo 'Configuring nginx...'",
       "sudo systemctl enable nginx",
