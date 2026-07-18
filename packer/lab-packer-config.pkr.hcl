@@ -41,8 +41,8 @@ source "openstack" "ubuntu-nginx" {
   source_image        = var.source_image
   flavor              = var.flavor
   networks            = [var.network_id]
-  availability_zone   = "GZ1"
-  volume_availability_zone = "GZ1"
+  availability_zone   = "MS1"
+  volume_availability_zone = "MS1"
   ssh_username        = "ubuntu"
   ssh_timeout         = "3m"
   floating_ip_network = "internet"
