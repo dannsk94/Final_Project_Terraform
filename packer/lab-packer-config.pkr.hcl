@@ -69,7 +69,10 @@ build {
       "sudo apt-get install -y nginx",
       
       "echo 'Installing PHP...'",
-      "sudo apt-get install -y php8.1-cli php8.1-fpm php8.1-mysql php8.1-common --fix-missing",
+      "sudo apt-get install -y software-properties-common",
+      "sudo add-apt-repository -y ppa:ondrej/php",
+      "sudo apt-get update -y",
+      "sudo apt-get install -y php8.1-fpm php8.1-mysql php8.1-cli",
   
       "echo 'Configuring nginx...'",
       "sudo systemctl enable nginx",
