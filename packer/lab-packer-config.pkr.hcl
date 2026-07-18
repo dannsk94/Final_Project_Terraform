@@ -64,13 +64,12 @@ build {
       
       "echo 'Updating system...'",
       "sudo apt-get update -y",
-      "sudo apt-get upgrade -y",
 
       "echo 'Installing nginx...'",
       "sudo apt-get install -y nginx",
       
       "echo 'Installing PHP...'",
-      "sudo apt-get install -y php8.3-cli php8.3-fpm php8.3-mysql php8.3-common --fix-missing",
+      "sudo apt-get install -y php8.1-cli php8.1-fpm php8.1-mysql php8.1-common --fix-missing",
   
       "echo 'Configuring nginx...'",
       "sudo systemctl enable nginx",
